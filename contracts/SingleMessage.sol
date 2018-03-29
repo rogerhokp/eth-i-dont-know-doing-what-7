@@ -16,7 +16,7 @@ contract SingleMessage is Ownable{
         maxLength = maxLengthArg;
     }
 
-    function set(string newMessage) external payable {
+    function setMessage(string newMessage) external payable {
         require(msg.value >= priceInWei);
         require(bytes(newMessage).length <= maxLength);
 
