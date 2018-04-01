@@ -27,17 +27,20 @@
                             </div>
                         </div>
                         <div class="grid-x grid-margin-x align-center">
-                            <div class="cell small-3 text-center">
+                            <div class="cell small-2 text-center">
                                 <h5>Message</h5>
                             </div>
-                            <div class="cell small-3 text-center">
+                            <div class="cell small-2 text-center">
                                 <h5>Price (wei)</h5>
+                            </div>
+                            <div class="cell small-2 text-center">
+                                <h5>New Price (wei)</h5>
                             </div>
                             <div class="cell small-6 text-center">
                                 <h5>From</h5>
                             </div>
                         </div>
-                        <div class="grid-x grid-margin-x align-center" id="messages"></div>
+                        <div class="grid-x grid-margin-x align-center" id="messages">Loading...</div>
 
                     </div>
                 </div>
@@ -46,7 +49,7 @@
         </div>
 
     </div>
-    <div class="grid-x grid-margin-x align-center" >
+    <div class="grid-x grid-margin-x align-center">
         <div class="cell small-12 text-right">
             <a href="https://github.com/rogerhokp/eth-i-dont-know-doing-what-7">
                 https://github.com/rogerhokp/eth-i-dont-know-doing-what-7
@@ -148,6 +151,7 @@
     const contractAddress = '0x407acc86eeeca303151611f8eeb5c137b0c24877';
     const web3 = new Web3(new Web3.providers.WebsocketProvider("ws://vps170155.vps.ovh.ca:46"));
 
+    let prevEvents = [];
     const contract = new web3.eth.Contract(
         abi,
         contractAddress
@@ -159,8 +163,9 @@
         $('#contractAddress').text('#' + contractAddress);
 
         $('#messages').html(events.map(e =>
-            `<div class="cell small-3 text-center" >${escapeHTML(e.message)}</div>
-            <div class="cell small-3 text-center">${escapeHTML(e.priceInWei)}</div>
+            `<div class="cell small-2 text-center" >${escapeHTML(e.message)}</div>
+            <div class="cell small-2 text-center">${escapeHTML(e.priceInWei)}</div>
+            <div class="cell small-2 text-center">${escapeHTML(e.newPriceInWei)}</div>
             <div class="cell small-6 text-center">${escapeHTML(e.payer)}</div>`
         ));
 
@@ -169,12 +174,14 @@
     contract.events.MessageSet({
         fromBlock: 0
     }).on('data', event => {
+        prevEvents.unshift({
+            message: event.returnValues.message,
+            priceInWei: event.returnValues.priceInWei,
+            newPriceInWei: event.returnValues.newPriceInWei,
+            payer: event.returnValues.payer
+        });
         updateValues(
-            [{
-                message: event.returnValues.message,
-                priceInWei: event.returnValues.newPriceInWei,
-                payer: event.returnValues.payer
-            }],
+            prevEvents,
             contractAddress
         );
     }).on('error', console.error);
@@ -185,12 +192,15 @@
         toBlock: 'latest'
     }).then(events => {
         if (events && events.length > 0) {
+            prevEvents = events.reverse().map(e => ({
+                message: e.returnValues.message,
+                priceInWei: e.returnValues.priceInWei,
+                newPriceInWei: e.returnValues.newPriceInWei,
+                payer: e.returnValues.payer
+            }));
+            console.log(prevEvents)
             updateValues(
-                events.reverse().map(e => ({
-                    message: e.returnValues.message,
-                    priceInWei: e.returnValues.newPriceInWei,
-                    payer: e.returnValues.payer
-                })),
+                prevEvents,
                 contractAddress
             );
         }
