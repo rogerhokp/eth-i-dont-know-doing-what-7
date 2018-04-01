@@ -1,0 +1,148 @@
+<html>
+<head>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css"
+          crossorigin="anonymous"/>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/js/foundation.min.js"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.rawgit.com/ethereum/web3.js/0.19.0/dist/web3.js"
+            type="application/javascript"></script>
+
+</head>
+<body>
+<div class="grid-container grid-container-padded full">
+    <div class="grid-x grid-padding-x align-center align-middle" style="height: 100%;">
+        <div class="cell small-6">
+            <div class="card">
+                <div class="card-section">
+                    <div class="grid-container grid-container-padded">
+                        <div class="grid-x grid-margin-x align-center">
+                            <div class="cell small-12 text-center"><span class="label secondary">KOVAN</span></div>
+                        </div>
+                        <div class="grid-x grid-margin-x align-center">
+                            <div class="cell small-6 text-center">
+                                <h5>Last Message</h5>
+                            </div>
+                            <div class="cell small-6 text-center">
+                                <h5>Price (wei)</h5>
+                            </div>
+                        </div>
+                        <div class="grid-x grid-margin-x align-center">
+                            <div class="cell small-6 text-center" id="lastMessage"></div>
+                            <div class="cell small-6 text-center" id="priceInWei"></div>
+                        </div>
+                        <div class="grid-x grid-margin-x align-center">
+                            <div class="cell small-12 text-center"><h5>From</h5></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script type="application/javascript">
+    $(document).foundation();
+    const abi = [{
+        "constant": true,
+        "inputs": [],
+        "name": "priceInWei",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }, {
+        "constant": true,
+        "inputs": [],
+        "name": "owner",
+        "outputs": [{"name": "", "type": "address"}],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }, {
+        "constant": true,
+        "inputs": [],
+        "name": "maxLength",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }, {
+        "constant": true,
+        "inputs": [],
+        "name": "message",
+        "outputs": [{"name": "", "type": "string"}],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }, {
+        "constant": false,
+        "inputs": [{"name": "newOwner", "type": "address"}],
+        "name": "transferOwnership",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }, {
+        "inputs": [{"name": "initialMessage", "type": "string"}, {
+            "name": "initialPriceInWei",
+            "type": "uint256"
+        }, {"name": "maxLengthArg", "type": "uint256"}],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    }, {
+        "anonymous": false,
+        "inputs": [{"indexed": false, "name": "message", "type": "string"}, {
+            "indexed": false,
+            "name": "priceInWei",
+            "type": "uint256"
+        }, {"indexed": false, "name": "newPriceInWei", "type": "uint256"}, {
+            "indexed": false,
+            "name": "payer",
+            "type": "address"
+        }],
+        "name": "MessageSet",
+        "type": "event"
+    }, {
+        "anonymous": false,
+        "inputs": [{"indexed": true, "name": "previousOwner", "type": "address"}, {
+            "indexed": true,
+            "name": "newOwnere",
+            "type": "address"
+        }],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    }, {
+        "constant": false,
+        "inputs": [{"name": "newMessage", "type": "string"}],
+        "name": "set",
+        "outputs": [],
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "function"
+    }, {
+        "constant": false,
+        "inputs": [{"name": "destination", "type": "address"}, {"name": "amountInWei", "type": "uint256"}],
+        "name": "withdraw",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }];
+    const web3 = new Web3(new Web3.providers.HttpProvider("https://kovan.infura.io/"));
+    const contract = web3.eth.contract(abi).at('0x407acc86eeeca303151611f8eeb5c137b0c24877');
+
+    // contract.MessageSet({}, {}, console.log)//infura kovan not support event subscription.....
+    const updateValues = () => {
+        $('#lastMessage').text(contract.message());
+        $('#priceInWei').text(contract.priceInWei());
+    };
+    setInterval(updateValues, 10000);
+    updateValues();
+</script>
+</body>
+</html>

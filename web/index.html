@@ -1,0 +1,208 @@
+<html>
+<head>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css"
+          crossorigin="anonymous"/>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/js/foundation.min.js"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.rawgit.com/ethereum/web3.js/v1.0.0-beta.33/dist/web3.min.js"
+            type="application/javascript"></script>
+
+</head>
+<body>
+<div class="grid-container grid-container-padded">
+    <div class="grid-x grid-padding-x align-center align-middle" style="height: 95%;">
+        <div class="cell small-10">
+            <div class="card">
+                <div class="card-section">
+                    <div class="grid-container grid-container-padded">
+                        <div class="grid-x grid-margin-x align-center">
+                            <div class="cell small-12 text-center">
+                                <h5>
+                                    <span class="label secondary">KOVAN</span>
+                                    Contract address:
+                                    <span id="contractAddress"></span>
+                                </h5>
+
+                            </div>
+                        </div>
+                        <div class="grid-x grid-margin-x align-center">
+                            <div class="cell small-3 text-center">
+                                <h5>Message</h5>
+                            </div>
+                            <div class="cell small-3 text-center">
+                                <h5>Price (wei)</h5>
+                            </div>
+                            <div class="cell small-6 text-center">
+                                <h5>From</h5>
+                            </div>
+                        </div>
+                        <div class="grid-x grid-margin-x align-center" id="messages"></div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="grid-x grid-margin-x align-center" >
+        <div class="cell small-12 text-right">
+            <a src="https://github.com/rogerhokp/eth-i-dont-know-doing-what-7">
+                https://github.com/rogerhokp/eth-i-dont-know-doing-what-7
+            </a>
+        </div>
+    </div>
+</div>
+
+<script type="application/javascript">
+    $(document).foundation();
+    const abi = [{
+        "constant": true,
+        "inputs": [],
+        "name": "priceInWei",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }, {
+        "constant": true,
+        "inputs": [],
+        "name": "owner",
+        "outputs": [{"name": "", "type": "address"}],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }, {
+        "constant": true,
+        "inputs": [],
+        "name": "maxLength",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }, {
+        "constant": true,
+        "inputs": [],
+        "name": "message",
+        "outputs": [{"name": "", "type": "string"}],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }, {
+        "constant": false,
+        "inputs": [{"name": "newOwner", "type": "address"}],
+        "name": "transferOwnership",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }, {
+        "inputs": [{"name": "initialMessage", "type": "string"}, {
+            "name": "initialPriceInWei",
+            "type": "uint256"
+        }, {"name": "maxLengthArg", "type": "uint256"}],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    }, {
+        "anonymous": false,
+        "inputs": [{"indexed": false, "name": "message", "type": "string"}, {
+            "indexed": false,
+            "name": "priceInWei",
+            "type": "uint256"
+        }, {"indexed": false, "name": "newPriceInWei", "type": "uint256"}, {
+            "indexed": false,
+            "name": "payer",
+            "type": "address"
+        }],
+        "name": "MessageSet",
+        "type": "event"
+    }, {
+        "anonymous": false,
+        "inputs": [{"indexed": true, "name": "previousOwner", "type": "address"}, {
+            "indexed": true,
+            "name": "newOwnere",
+            "type": "address"
+        }],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    }, {
+        "constant": false,
+        "inputs": [{"name": "newMessage", "type": "string"}],
+        "name": "set",
+        "outputs": [],
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "function"
+    }, {
+        "constant": false,
+        "inputs": [{"name": "destination", "type": "address"}, {"name": "amountInWei", "type": "uint256"}],
+        "name": "withdraw",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }];
+
+    const contractAddress = '0x407acc86eeeca303151611f8eeb5c137b0c24877';
+    const web3 = new Web3(new Web3.providers.WebsocketProvider("ws://vps170155.vps.ovh.ca:46"));
+
+    const contract = new web3.eth.Contract(
+        abi,
+        contractAddress
+    );
+
+
+    const updateValues = (events, contractAddress) => {
+
+        $('#contractAddress').text('#' + contractAddress);
+
+        $('#messages').html(events.map(e =>
+            `<div class="cell small-3 text-center" >${escapeHTML(e.message)}</div>
+            <div class="cell small-3 text-center">${escapeHTML(e.priceInWei)}</div>
+            <div class="cell small-6 text-center">${escapeHTML(e.payer)}</div>`
+        ));
+
+    };
+
+    contract.events.MessageSet({
+        fromBlock: 0
+    }).on('data', event => {
+        updateValues(
+            [{
+                message: event.returnValues.message,
+                priceInWei: event.returnValues.newPriceInWei,
+                payer: event.returnValues.payer
+            }],
+            contractAddress
+        );
+    }).on('error', console.error);
+
+
+    contract.getPastEvents('MessageSet', {
+        fromBlock: 0,
+        toBlock: 'latest'
+    }).then(events => {
+        if (events && events.length > 0) {
+            updateValues(
+                events.reverse().map(e => ({
+                    message: e.returnValues.message,
+                    priceInWei: e.returnValues.newPriceInWei,
+                    payer: e.returnValues.payer
+                })),
+                contractAddress
+            );
+        }
+
+    }).catch(console.error);
+
+    function escapeHTML(unsafeText) {
+        var div = document.createElement('div');
+        div.innerText = unsafeText;
+        return div.innerHTML;
+    }
+
+</script>
+</body>
+</html>
