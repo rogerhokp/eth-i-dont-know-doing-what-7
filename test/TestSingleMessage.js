@@ -36,7 +36,7 @@ contract("SingleMessage", function (accounts) {
         try {
             await this.contract.set(newMessage, {value: price - 1});
         } catch (error) {
-            assert.equal(true, error.message.search('invalid opcode') >= 0);
+            assert.equal(true, error.message.search('VM Exception while processing transaction') >= 0);
             assert.equal(await this.contract.message(), initialMessage);
             assert.equal((await this.contract.priceInWei()).toNumber(), price);
             return;
@@ -54,7 +54,7 @@ contract("SingleMessage", function (accounts) {
         try {
             await this.contract.set(newMessage, {value: price});
         } catch (error) {
-            assert.equal(true, error.message.search('invalid opcode') >= 0);
+            assert.equal(true, error.message.search('VM Exception while processing transaction') >= 0);
             assert.equal(await this.contract.message(), initialMessage);
             assert.equal((await this.contract.priceInWei()).toNumber(), price);
             return
@@ -92,7 +92,7 @@ contract("SingleMessage", function (accounts) {
         try {
             await this.contract.withdraw(nonOwner, price, {from: nonOwner});
         } catch (error) {
-            assert.equal(true, error.message.search('invalid opcode') >= 0);
+            assert.equal(true, error.message.search('VM Exception while processing transaction') >= 0);
             return;
         }
         throw 'Contract should have thrown, but did not!';

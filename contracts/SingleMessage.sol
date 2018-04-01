@@ -3,7 +3,7 @@ pragma solidity ^0.4.17;
 import "./Ownable.sol";
 
 
-contract SingleMessage is Ownable{
+contract SingleMessage is Ownable {
     string public message;
     uint256 public priceInWei;
     uint256 public maxLength;
@@ -16,7 +16,7 @@ contract SingleMessage is Ownable{
         maxLength = maxLengthArg;
     }
 
-    function setMessage(string newMessage) external payable {
+    function set(string newMessage) external payable {
         require(msg.value >= priceInWei);
         require(bytes(newMessage).length <= maxLength);
 
