@@ -149,7 +149,7 @@
     }];
 
     const contractAddress = '0x407acc86eeeca303151611f8eeb5c137b0c24877';
-    const web3 = new Web3(new Web3.providers.WebsocketProvider("ws://vps170155.vps.ovh.ca:46"));
+    const web3 = new Web3(new Web3.providers.WebsocketProvider("ws://ec2-54-250-206-247.ap-northeast-1.compute.amazonaws.com:8546"));
 
     let prevEvents = [];
     const contract = new web3.eth.Contract(

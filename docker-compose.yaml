@@ -15,10 +15,10 @@ services:
   public-kovan:
     image: parity/parity:v1.9.5
     ports:
-      - "45:8545"
-      - "46:8546"
-      - "30304:30304"
-      - "30304:30304/udp"
+      - "8545:8545"
+      - "8546:8546"
+      - "30303:30303"
+      - "30303:30303/udp"
     volumes:
-      - "/root/public-kovan/io.parity.ethereum/docker/:/root/.local/share/io.parity.ethereum/"
+      - "/home/ubuntu/public-kovan/io.parity.ethereum/docker/:/root/.local/share/io.parity.ethereum/"
     command: --mode active --pruning archive --port 30304 --no-ui --no-dapps --no-hardware-wallets --no-secretstore --no-secretstore-http --public-node --chain=kovan --jsonrpc-interface all --jsonrpc-hosts all --jsonrpc-apis safe --jsonrpc-cors all --ws-interface all --ws-hosts all --ws-apis "web3,eth,pubsub,net,parity,parity_pubsub,traces,rpc,secretstore,shh,shh_pubsub" --ws-origins all
