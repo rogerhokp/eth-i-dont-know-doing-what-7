@@ -17,6 +17,8 @@ services:
     ports:
       - "45:8545"
       - "46:8546"
+      - "30304:30304"
+      - "30304:30304/udp"
     volumes:
       - "/root/public-kovan/io.parity.ethereum/docker/:/root/.local/share/io.parity.ethereum/"
-    command: --no-ui --no-dapps --no-hardware-wallets --no-secretstore --no-secretstore-http --public-node --chain=kovan --jsonrpc-interface all --jsonrpc-hosts all --jsonrpc-apis safe --jsonrpc-cors all --ws-interface all --ws-hosts all --ws-apis "web3,eth,pubsub,net,parity,parity_pubsub,traces,rpc,secretstore,shh,shh_pubsub" --ws-origins all
+    command: --mode active --port 30304 --no-ui --no-dapps --no-hardware-wallets --no-secretstore --no-secretstore-http --public-node --chain=kovan --jsonrpc-interface all --jsonrpc-hosts all --jsonrpc-apis safe --jsonrpc-cors all --ws-interface all --ws-hosts all --ws-apis "web3,eth,pubsub,net,parity,parity_pubsub,traces,rpc,secretstore,shh,shh_pubsub" --ws-origins all
